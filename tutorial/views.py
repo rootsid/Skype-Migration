@@ -3,8 +3,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from tutorial.auth_helper import get_sign_in_url, get_token_from_code, store_token, store_user, remove_user_and_token, \
     get_token
-from tutorial.graph_helper import get_user, get_calendar_events
+from tutorial.graph_helper import get_user, get_calendar_events, schedule_meeting
 import dateutil.parser
+from _datetime import datetime
 
 
 def initialize_context(request):
@@ -99,14 +100,44 @@ def calendar(request):
     context = initialize_context(request)
     token = get_token(request)
     events = get_calendar_events(token)
+    user = get_user(token)
+    mail = user.get('mail')
+    # meeting = schedule_meeting(token)
+    # print(user, '\n\n\n\n\n')
 
     if events:
         # Convert the ISO 8601 date times to a datetime object
         # This allows the Django template to format the value nicely
+        count = 0
         for event in events['value']:
-            event['start']['dateTime'] = dateutil.parser.parse(event['start']['dateTime'])
-            event['end']['dateTime'] = dateutil.parser.parse(event['end']['dateTime'])
-
-        context['events'] = events['value']
+            start_key = event.get('start')
+            start_key = start_key.get('dateTime')
+            date_fixed = start_key.split('T')[0]
+            date_fixed = datetime.strptime(date_fixed, '%Y-%m-%d')
+            todays_date = datetime.today()
+            organizer = event.get('organizer'); organizer = organizer.get('emailAddress'); organizer = organizer.get('address')
+            # print(organizer, mail)
+            # print(event)
+            if mail == organizer:
+                if todays_date > date_fixed:
+                    event['start']['dateTime'] = dateutil.parser.parse(event['start']['dateTime'])
+                    event['end']['dateTime'] = dateutil.parser.parse(event['end']['dateTime'])
+                    count += 1
+                context['events'] = events['value']
+                pass
+            else:
+                if count < 1:
+                    request.session['flash_error'] = {'message': 'No new meeting found by your name.','debug' : 'No new meetings.'}
+                else :
+                    event['subject'] = None
+                    event['organizer'] = None
 
     return render(request, 'tutorial/calendar.html', context)
+
+# def calendar(request):
+#     context = initialize_context(request)
+#     token = get_token(request)
+#     calendars = get_calendar_events(token)
+#
+#     # print(calendars)
+#     return render(request, 'tutorial/calendar.html')
