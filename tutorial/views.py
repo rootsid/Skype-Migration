@@ -103,12 +103,14 @@ def calendar(request):
     user = get_user(token)
     mail = user.get('mail')
     # meeting = schedule_meeting(token)
+    # print(meeting)
     # print(user, '\n\n\n\n\n')
 
     if events:
         # Convert the ISO 8601 date times to a datetime object
         # This allows the Django template to format the value nicely
         count = 0
+
         for event in events['value']:
             start_key = event.get('start')
             start_key = start_key.get('dateTime')
