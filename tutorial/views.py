@@ -143,3 +143,7 @@ def calendar(request):
 #
 #     # print(calendars)
 #     return render(request, 'tutorial/calendar.html')
+
+def migrate(request):
+    context = initialize_context(request)
+    return render(request, 'tutorial/migrate.html', context)

@@ -1,0 +1,22 @@
+{% extends "tutorial/layout.html" %}
+{% block content %}
+       <h4>Welcome {{ user.name }}!</h4>
+       <p></p>
+        <div class="card text-white bg-dark mb-3" style="max-width: 2500rem;">
+        <div class="card-header">
+            <div>
+                <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="sr-only">Loading...</span>
+                </div>
+                <h5 class="card-title" style="float: left; padding-right: 12px;">Migration coming soon.</h5>
+            </div>
+        </div>
+          <div class="card-body">
+                <p style="padding-top: 12px; text-align: center;">Verify your meetings in Calendar once, in meantime.</p>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <p style="text-align: center; padding-top: 12px; margin-bottom: 0px;">On it.</p>
+          </div>
+        </div>
+{% endblock content %}

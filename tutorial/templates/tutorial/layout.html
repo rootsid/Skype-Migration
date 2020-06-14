@@ -14,7 +14,7 @@
  <body>
    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
      <div class="container">
-       <a href="{% url 'home' %}" class="navbar-brand">Python Graph Application</a>
+       <a href="{% url 'home' %}" class="navbar-brand">Skype Migrator</a>
        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
          aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
          <span class="navbar-toggler-icon"></span>
@@ -28,21 +28,20 @@
              <li class="nav-item" data-turbolinks="false">
                <a class="nav-link{% if request.resolver_match.view_name == 'calendar' %} active{% endif %}" href="{% url 'calendar' %}">Calendar</a>
              </li>
+             <li>
+                <a class="nav-link{% if request.resolver_match.view_name == 'Migration' %} active{% endif %}" href="{% url 'migrate' %}">Migrate</a>
+             </li>
            {% endif %}
          </ul>
          <ul class="navbar-nav justify-content-end">
-           <li class="nav-item">
-             <a class="nav-link" href="https://developer.microsoft.com/graph/docs/concepts/overview" target="_blank">
-               <i class="fas fa-external-link-alt mr-1"></i>Docs
-             </a>
-           </li>
            {% if user.is_authenticated %}
              <li class="nav-item dropdown">
                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                  {% if user.avatar %}
                    <img src="{{ user.avatar }}" class="rounded-circle align-self-center mr-2" style="width: 32px;">
                  {% else %}
-                   <i class="far fa-user-circle fa-lg rounded-circle align-self-center mr-2" style="width: 32px;"></i>
+{#                   <p>{{ user.name }}</p>#}
+                     <i class="far fa-user-circle fa-lg rounded-circle align-self-center mr-2" style="width: 32px;"></i>
                  {% endif %}
                </a>
                <div class="dropdown-menu dropdown-menu-right">
