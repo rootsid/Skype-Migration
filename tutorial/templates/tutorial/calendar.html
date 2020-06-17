@@ -13,13 +13,15 @@
  <tbody>
    {% if events %}
      {% for event in events %}
-         {% if event.organizer.emailAddress.name %}
-           <tr>
-             <td>{{ event.organizer.emailAddress.name|default_if_none:'' }}</td>
-             <td>{{ event.subject|default_if_none:'' }}</td>
-             <td>{{ event.start.dateTime|date:'SHORT_DATETIME_FORMAT'|default_if_none:'' }}</td>
-             <td>{{ event.end.dateTime|date:'SHORT_DATETIME_FORMAT'|default_if_none:'' }}</td>
-           </tr>
+         {% if user.name in event.organizer.emailAddress.name %}
+             {% if event.start.dateTime %}
+               <tr>
+                 <td>{{ event.organizer.emailAddress.name|default_if_none:'' }}</td>
+                 <td>{{ event.subject|default_if_none:'' }}</td>
+                 <td>{{ event.start.dateTime|date:'SHORT_DATETIME_FORMAT'|default_if_none:'' }}</td>
+                 <td>{{ event.end.dateTime|date:'SHORT_DATETIME_FORMAT'|default_if_none:'' }}</td>
+               </tr>
+             {% endif %}
          {% endif %}
      {% endfor %}
    {% endif %}

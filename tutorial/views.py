@@ -6,7 +6,7 @@ from tutorial.auth_helper import get_sign_in_url, get_token_from_code, store_tok
 from tutorial.graph_helper import get_user, get_calendar_events, schedule_meeting
 import dateutil.parser
 from _datetime import datetime
-
+import json
 
 def initialize_context(request):
     context = {}
@@ -115,24 +115,28 @@ def calendar(request):
             start_key = event.get('start')
             start_key = start_key.get('dateTime')
             date_fixed = start_key.split('T')[0]
-            date_fixed = datetime.strptime(date_fixed, '%Y-%m-%d')
-            todays_date = datetime.today()
+            date_fixed = str(datetime.strptime(date_fixed, '%Y-%m-%d')); date_fixed = date_fixed.split(" ")[0]
+            todays_date = str(datetime.today()); todays_date = todays_date.split(" ")[0]
             organizer = event.get('organizer'); organizer = organizer.get('emailAddress'); organizer = organizer.get('address')
             # print(organizer, mail)
             # print(event)
+
             if mail == organizer:
-                if todays_date > date_fixed:
+                # print(event)
+                if date_fixed > todays_date:
                     event['start']['dateTime'] = dateutil.parser.parse(event['start']['dateTime'])
                     event['end']['dateTime'] = dateutil.parser.parse(event['end']['dateTime'])
                     count += 1
-                context['events'] = events['value']
-                pass
+                    context['events'] = events['value']
+                    # print(json.dumps(event, indent=4, sort_keys=True, default=str))
+                else:
+                    event['subject'] = None
+                    event['organizer'] = None
             else:
                 if count < 1:
                     request.session['flash_error'] = {'message': 'No new meeting found by your name.','debug' : 'No new meetings.'}
                 else :
-                    event['subject'] = None
-                    event['organizer'] = None
+                    pass
 
     return render(request, 'tutorial/calendar.html', context)
 

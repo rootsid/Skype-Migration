@@ -24,7 +24,7 @@ def get_calendar_events(token):
     # events = graph_client.get('{0}/me/calendar'.format(graph_url), params=query_params)
     # '$select': 'subject,body,attendees,organizer,start,end,location'
     query_params = {
-        '$select': 'subject,organizer,start,end',
+        '$select': 'subject,organizer,start,end,attendees,body',
         '$orderby': 'createdDateTime DESC',
         '$top': '5000',
     }
