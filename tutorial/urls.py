@@ -7,5 +7,6 @@ urlpatterns = [
     path('callback', views.callback, name='callback'),
     path('signout', views.sign_out, name='signout'),
     path('calendar', views.calendar, name='calendar'),
-    path('migrate', views.migrate, name='migrate')
+    path('migrate', views.migrate, name='migrate'),
+    path('migrateNow', views.migrateNowToTeams, name='test button')
 ]

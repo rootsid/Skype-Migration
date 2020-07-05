@@ -3,10 +3,15 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from tutorial.auth_helper import get_sign_in_url, get_token_from_code, store_token, store_user, remove_user_and_token, \
     get_token
-from tutorial.graph_helper import get_user, get_calendar_events, schedule_meeting
+from tutorial.graph_helper import get_user, get_calendar_events, schedule_meeting, migrateNow
 import dateutil.parser
 from _datetime import datetime
 import json
+from requests_oauthlib import OAuth2Session
+from django.utils import timezone
+from bs4 import BeautifulSoup
+graph_url = 'https://graph.microsoft.com/v1.0'
+
 
 def initialize_context(request):
     context = {}
@@ -115,30 +120,43 @@ def calendar(request):
             start_key = event.get('start')
             start_key = start_key.get('dateTime')
             date_fixed = start_key.split('T')[0]
-            date_fixed = str(datetime.strptime(date_fixed, '%Y-%m-%d')); date_fixed = date_fixed.split(" ")[0]
-            todays_date = str(datetime.today()); todays_date = todays_date.split(" ")[0]
-            organizer = event.get('organizer'); organizer = organizer.get('emailAddress'); organizer = organizer.get('address')
+            date_fixed = str(datetime.strptime(date_fixed, '%Y-%m-%d'));
+            date_fixed = date_fixed.split(" ")[0]
+            todays_date = str(datetime.today());
+            todays_date = todays_date.split(" ")[0]
+            organizer = event.get('organizer');
+            organizer = organizer.get('emailAddress');
+            organizer = organizer.get('address')
             # print(organizer, mail)
             # print(event)
-
-            if mail == organizer:
-                # print(event)
-                if date_fixed > todays_date:
-                    event['start']['dateTime'] = dateutil.parser.parse(event['start']['dateTime'])
-                    event['end']['dateTime'] = dateutil.parser.parse(event['end']['dateTime'])
-                    count += 1
-                    context['events'] = events['value']
-                    # print(json.dumps(event, indent=4, sort_keys=True, default=str))
+            event_info = json.dumps(event, indent=4, sort_keys=True, default=str)
+            json_info = json.loads(event_info)
+            attendees = json_info['attendees']
+            html = json_info['body']
+            soup = BeautifulSoup(html['content'], "html.parser")
+            [s.extract() for s in soup(['head', 'title'])]
+            visible_text = soup.getText()
+            if 'Skype' in visible_text:
+                if mail == organizer:
+                    # print(event)
+                    if date_fixed > todays_date:
+                        event['start']['dateTime'] = dateutil.parser.parse(event['start']['dateTime'])
+                        event['end']['dateTime'] = dateutil.parser.parse(event['end']['dateTime'])
+                        count += 1
+                        context['events'] = events['value']
+                        # print(json.dumps(event, indent=4, sort_keys=True, default=str))
                 else:
                     event['subject'] = None
                     event['organizer'] = None
             else:
                 if count < 1:
-                    request.session['flash_error'] = {'message': 'No new meeting found by your name.','debug' : 'No new meetings.'}
-                else :
+                    request.session['flash_error'] = {'message': 'No new meeting found by your name.',
+                                                      'debug': 'No new meetings.'}
+                else:
                     pass
 
     return render(request, 'tutorial/calendar.html', context)
+
 
 # def calendar(request):
 #     context = initialize_context(request)
@@ -148,6 +166,15 @@ def calendar(request):
 #     # print(calendars)
 #     return render(request, 'tutorial/calendar.html')
 
+
 def migrate(request):
     context = initialize_context(request)
+    return render(request, 'tutorial/migrate.html', context)
+
+
+def migrateNowToTeams(request):
+    context = initialize_context(request)
+    token = get_token(request)
+    meeting = migrateNow(token)
+    print(meeting)
     return render(request, 'tutorial/migrate.html', context)
