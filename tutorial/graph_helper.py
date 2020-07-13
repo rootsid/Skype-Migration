@@ -55,8 +55,8 @@ def schedule_meeting(token):
                                                                          "attendees": [
                                                                              {
                                                                                  "emailAddress": {
-                                                                                     "address": "sidharth.kaushik@atos.net",
-                                                                                     "name": "Sidharth Kaushik"
+                                                                                     "address": "",
+                                                                                     "name": ""
                                                                                  },
                                                                                  "type": "required"
                                                                              }
